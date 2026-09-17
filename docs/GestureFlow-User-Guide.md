@@ -5,7 +5,7 @@ GestureFlow turns one visible hand into Windows mouse controls and a hold-to-tal
 
 ## Start here
 
-1. Launch GestureFlow.exe from Documents\GestureFlow or its desktop shortcut.
+1. After setup, launch the GestureFlow desktop shortcut or Start-GestureFlow.cmd. The original PC may also use its existing GestureFlow.exe.
 2. Start FlowSpeak normally or use Launch in the Connected to FlowSpeak card. Confirm its existing Right Control hold-to-talk shortcut works in a text editor.
 3. Select your controlling hand and Pointer display. The camera opens automatically. To choose a different Camera index, stop the camera, change the index, then start it again.
 4. Enable Preview only - do not control PC to practice without moving the mouse or pressing keys.
@@ -17,6 +17,25 @@ Keep your keyboard and physical mouse available while learning. Ctrl+Alt+G locks
 Open palm turns control ON; a closed fist turns it OFF. Camera tracking continues in both states. Index pointing moves the pointer only when control is ON; it never turns control ON or OFF. Gestures cannot bypass a keyboard lock. Stop the camera or close GestureFlow to end capture.
 
 Right-hand control is selected by default. Hand labels are corrected for the mirrored camera input so Right means your anatomical right hand. Tracking can detect both hands, but only the selected hand controls input; your left hand can rest on your face. A right-hand label must have at least 80% confidence. If missing or uncertain, GestureFlow never substitutes the left: held input releases and movement freezes, while the ON/OFF state is retained. The selector remains available to change your preference.
+
+## Install on a laptop
+
+GestureFlow v0.1.1 targets Windows on Intel/AMD 64-bit processors. This release is not for macOS, Linux, or native Windows ARM. Install Python 3.13 64-bit first; choose that version on python.org's Windows downloads page. Internet access is required during setup.
+
+1. Extract the complete source ZIP into a writable folder such as Documents\GestureFlow. Do not run from inside the ZIP or place it in Program Files.
+2. Double-click Install.cmd. It creates a local .venv, installs pinned binary wheels, runs pip check, validates model loading and the input helper, and creates a desktop shortcut.
+3. Launch the shortcut or Start-GestureFlow.cmd. This route needs neither the optional GestureFlow.exe nor .NET.
+4. Permit camera access for desktop apps in Windows privacy settings. Select the correct camera index if needed.
+5. Install FlowSpeak separately and confirm physical Right Ctrl works. GestureFlow looks in the current user's Documents folders; use Locate to select the laptop's FlowSpeak.exe when necessary.
+6. Calibrate your comfortable range on the laptop, practice in Preview only, then turn control ON with an open palm.
+
+The ZIP includes source, model, docs, and setup scripts. Python, installed dependencies, and FlowSpeak are not bundled. Do not copy another PC's .venv, settings.json, or calibration. Fresh settings use Right as the controlling hand with the floating status overlay off. Keep the extracted folder intact after installation.
+
+The dashboard fits the available screen at startup and provides horizontal and vertical scrolling on small or scaled displays; both scrollbars were verified in an offscreen 640 x 480 check.
+
+If setup fails, read the setup window and rerun Install.cmd after correcting the issue. For an incompatible existing environment, extract into a fresh folder. To start from a terminal instead, run .\.venv\Scripts\python.exe main.py from a terminal in the project folder. See docs\Laptop-Install.md for the dedicated quickstart and troubleshooting.
+
+Setup checks on the development PC do not establish compatibility with your physical laptop's camera, microphone, permissions, or FlowSpeak configuration. Perform the practical gesture and dictation checks on that laptop.
 
 ## Gesture controls
 
@@ -132,13 +151,16 @@ Camera angle, lighting, motion blur, hand occlusion, and individual hand posture
 
 ## Developer reference
 
-The application lives in C:\Users\MUN86606\Documents\GestureFlow. The executable is a launcher for the project-local Python environment; keep the project folder and .venv together.
+On each computer, the application lives in the folder where you extracted it, typically your Documents\GestureFlow folder. The original development PC used C:\Users\MUN86606\Documents\GestureFlow; that historical path is not required on a laptop. Both launch methods use the project-local Python environment; keep the folder and .venv together.
 
 Installed runtime: Python 3.13.13, PySide6 6.11.2, MediaPipe 1.0.1, opencv-contrib-python 5.0.0.93, psutil 7.2.2, and NumPy 2.5.3. Windows input uses ctypes and Win32 APIs. The MediaPipe Hand Landmarker task asset is stored in models\hand_landmarker.task. The C# launcher targets .NET 10 for Windows and is published self-contained; the Python application still uses .venv.
 
 | File or directory | Responsibility |
 | --- | --- |
-| GestureFlow.exe | Windows launcher; starts the project-local Python app without a console window. |
+| Start-GestureFlow.cmd | Included launcher for the local Python app; no .NET or VBScript required. |
+| Install.cmd / Install.ps1 | Windows/Python checks, local environment setup, pinned dependencies, shortcut creation. |
+| scripts\verify_install.py | Import, model, and input-helper setup validation. |
+| GestureFlow.exe | Optional original-PC native launcher; not needed for laptop setup. |
 | main.py | Python entry point. |
 | gestureflow\app.py | PySide6 window, settings, preview, floating status, FlowSpeak process detection, input dispatch. |
 | gestureflow\tracker.py | Camera acquisition, mirrored preview, up to two detected hands, confidence-gated controlling-hand selection. |
@@ -193,19 +215,8 @@ For troubleshooting, inspect work\gestureflow.log and work\input-helper.log. wor
 
 The automated suite contains 83 passing tests. It covers calibration, fingertip pointing, pinch exclusivity, click/drag/Enter, hold release, hand loss, processing stalls, ON/OFF control, lock, right-click repeat protection, scrolling, monitor bounds, stale commands, EOF, broker watchdog cleanup, and confident right-hand selection regardless of result order. These tests use constructed hand states and a fake input backend; they do not prove physical-camera gesture accuracy or successful FlowSpeak transcription.
 
-The native launcher published successfully. The desktop app was launched and its native UI inspected. Camera index 0 and the MediaPipe inference worker ran at approximately 30 frames per second with no visible hand; FlowSpeak's running process was detected. Ctrl+Alt+G was verified to lock controls, then unlock them on a second press while camera processing continued. This shortcut uses Windows RegisterHotKey and Qt native event handling. A desktop shortcut was created at C:\Users\MUN86606\Desktop\GestureFlow.lnk. FlowSpeak files were not modified.
+On the original PC, the native launcher built and the UI was inspected. Camera 0 and inference ran near 30 FPS; FlowSpeak was detected. Ctrl+Alt+G locked and unlocked controls while capture continued. The shortcut uses Windows RegisterHotKey and Qt native events. FlowSpeak files were not modified.
 
 Physical gesture accuracy, comfortable pointer tuning, and the complete spoken-dictation-to-text flow remain for your hands-on test. The software checks above establish startup, camera processing, interface availability, and deterministic input behavior; they do not replace that practical validation.
 
-Native UI checks showed the smaller bottom-right area and sliders; repositioning appeared in the preview and saved settings. Real hand landmarks were observed at approximately 30 FPS.
-
-
-
-
-
-
-
-
-
-
-
+Fresh setup on the development PC passed dependency, model/input-helper, and offscreen dashboard checks. This was a separate clean environment, not the physical laptop; laptop hardware and end-to-end dictation remain to be tested there.

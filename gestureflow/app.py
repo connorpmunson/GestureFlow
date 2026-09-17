@@ -8,7 +8,7 @@ import subprocess
 import sys
 import time
 import psutil
-from PySide6.QtCore import Qt, QTimer, QLockFile, QRectF, QAbstractNativeEventFilter, Signal
+from PySide6.QtCore import Qt, QTimer, QLockFile, QRectF, QAbstractNativeEventFilter, Signal, QStandardPaths
 from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPen, QPixmap, QShortcut, QKeySequence, QIcon
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QLabel, QPushButton, QVBoxLayout,
     QHBoxLayout, QGridLayout, QFrame, QComboBox, QCheckBox, QSlider, QSpinBox, QFileDialog, QMessageBox,
@@ -117,7 +117,7 @@ class Hud(QLabel):
 class Broker:
     def __init__(self):
         self.log = open(ROOT / "work/input-helper.log", "a", encoding="utf-8")
-        self.process = subprocess.Popen([str(ROOT / ".venv/Scripts/python.exe"), "-m", "gestureflow.broker"],
+        self.process = subprocess.Popen([sys.executable, "-m", "gestureflow.broker"],
              cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=self.log,
              text=True, encoding="utf-8", creationflags=subprocess.CREATE_NO_WINDOW)
         self.last = 0.0
@@ -188,8 +188,10 @@ class Window(QMainWindow):
     def __init__(self, preview=False, no_camera=False):
         super().__init__()
         self.setWindowTitle("GestureFlow")
-        self.resize(1180, 850)
-        self.setMinimumSize(970, 720)
+        available = QApplication.primaryScreen().availableGeometry()
+        self.setMinimumSize(640, 400)
+        self.resize(min(1180, max(640, available.width() - 40)),
+                    min(850, max(400, available.height() - 60)))
         self.setWindowIcon(make_icon())
         self.engine, self.pointer = Engine(), Pointer()
         self.tracker = None
@@ -202,7 +204,9 @@ class Window(QMainWindow):
         self.broker_error = False
         self.flow_running = False
         self.voice_held = False
-        self.flow_path = r"C:\Users\MUN86606\Documents\flowspeak\publish\FlowSpeak-win-x64\FlowSpeak.exe"
+        documents = Path(QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation))
+        candidate = documents / "flowspeak/publish/FlowSpeak-win-x64/FlowSpeak.exe"
+        self.flow_path = str(candidate) if candidate.is_file() else ""
         self.settings = self.load_settings()
         self.calibrator = None
         self.calibration_was_locked = False
@@ -239,7 +243,13 @@ class Window(QMainWindow):
     def build_ui(self, preview):
         root = QWidget()
         root.setObjectName("root")
-        self.setCentralWidget(root)
+        root.setMinimumSize(970, 720)
+        viewport = QScrollArea()
+        viewport.setObjectName("workspaceScroll")
+        viewport.setStyleSheet("QScrollArea#workspaceScroll { border: none; }")
+        viewport.setWidgetResizable(True)
+        viewport.setWidget(root)
+        self.setCentralWidget(viewport)
         main = QVBoxLayout(root)
         main.setContentsMargins(28,22,28,20)
         main.setSpacing(18)
@@ -334,7 +344,7 @@ class Window(QMainWindow):
         self.preview_only.toggled.connect(self.change_preview)
         sl.addWidget(self.preview_only)
         self.show_hud = QCheckBox("Show floating status")
-        self.show_hud.setChecked(self.settings.get("hud",True))
+        self.show_hud.setChecked(self.settings.get("hud",False))
         self.show_hud.toggled.connect(self.save_settings)
         sl.addWidget(self.show_hud)
         sidebar.addWidget(setup)

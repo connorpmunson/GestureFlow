@@ -2,7 +2,18 @@
 
 A Windows desktop app that turns local webcam hand landmarks into mouse control and an additional hold-to-talk trigger for the existing FlowSpeak app.
 
-**Launch:** double-click `GestureFlow.exe` in this folder, or use the GestureFlow desktop shortcut. The launcher uses the installed `.venv`; keep the project folder intact. Camera starts automatically. Hold an open palm for 0.35 seconds to turn gesture control ON; hold a closed fist for 0.30 seconds to turn it OFF. Neither action closes the app or camera.
+## Install on a laptop
+
+1. Use Windows on an Intel/AMD 64-bit processor. This release does not support macOS, Linux, or native Windows ARM.
+2. Install Python 3.13 **64-bit** from the tested [Python 3.13.13 release](https://www.python.org/downloads/release/python-31313/).
+3. Extract the **complete** v0.1.1 release **Source code (zip)** archive into a writable folder such as `Documents\GestureFlow`. Do not run inside the ZIP or install into Program Files.
+4. Double-click `Install.cmd` with internet access. Setup creates a local `.venv`, installs pinned binary dependencies, verifies them, loads the model, checks the input helper, and creates a desktop shortcut.
+5. Launch the shortcut or `Start-GestureFlow.cmd`. Neither the optional large executable nor .NET is needed for this launch path.
+6. Install FlowSpeak separately, test its physical Right Ctrl hold-to-talk shortcut, then use GestureFlow's **Locate** button if needed. Calibrate again on the laptop.
+
+The source ZIP includes code, model, docs, and setup scripts. It does not include Python, installed dependencies, or FlowSpeak. Do not copy another PC's `.venv`, `settings.json`, or calibration. Fresh settings use the right hand with the floating status overlay off. See `docs/Laptop-Install.md` for troubleshooting.
+
+**Launch after setup:** use the desktop shortcut or `Start-GestureFlow.cmd`; the original PC can also use its existing `GestureFlow.exe`. Keep the project folder intact. Camera starts automatically. Hold an open palm for 0.35 seconds to turn gesture control ON; hold a closed fist for 0.30 seconds to turn it OFF. Neither action closes the app or camera.
 
 **Controls (right hand):** while ON, only index extended moves the pointer using its fingertip. Keep the index straight and other fingers curled; touch your thumb to the side of the index to click, hold contact to drag, and release to drop. The old index-tip pinch no longer clicks. Middle bent to thumb with index/ring/pinky extended holds FlowSpeak's Right Ctrl; ring bent to thumb with index/middle/pinky extended sends Enter once. Maintain each exact shape; changing it releases after 0.10 seconds. Thumbs-up scrolls up/down; thumb and pinky extended right-clicks. Index and pinky extended with middle, ring, and thumb closed switches windows: hold 0.30 seconds to open Alt+Tab, keep holding to advance every 0.75 seconds, then release the gesture for 0.15 seconds to select the highlighted window. Physical modifier keys block switching; the pointer stays still. Actions do not switch control OFF. Hand loss releases input and freezes movement while retaining ON state. **Ctrl+Alt+G** locks/unlocks; Escape locks when GestureFlow is focused. Wait for FlowSpeak's text before Enter; it acts immediately in the focused app.
 
@@ -15,6 +26,7 @@ Enable **Preview only — do not control PC** to practice without injecting inpu
 - `docs/GestureFlow-User-Guide.pdf`: setup, architecture, settings, troubleshooting and verification.
 - `docs/GestureFlow-Gesture-Cheat-Sheet.pdf`: printable quick reference.
 - Markdown sources are alongside the PDFs.
+- `docs/Laptop-Install.md`: clean laptop setup and verification steps.
 
 ## Development
 
@@ -39,5 +51,3 @@ Copy-Item work/launcher-publish/GestureFlow.exe GestureFlow.exe
 The executable is a launcher, not a standalone redistribution of Python, model and dependencies. Camera frames stay in memory; no camera recording or uploads. FlowSpeak retains its own existing cloud audio processing. Debug metadata and errors are in `work/`; configuration is in `settings.json`.
 
 Recognition feedback: a compact middle-thumb or ring-thumb pinch is valid even when the bent fingertip is near its knuckle. The other three fingers must still be extended. If a tool gesture is incomplete, the HUD identifies which fingers need extending or whether the fingertips need to touch. The dashboard reports the detected extended fingers; `work/status.json` includes current finger flags and normalized contact distances for troubleshooting, without saving camera images. FlowSpeak continues to use the unchanged Right Ctrl hold/release bridge.
-
-
