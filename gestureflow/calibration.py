@@ -50,4 +50,4 @@ class Calibration:
             self.error = "The center must sit between your extremes. Try again from the same resting position."
         else:
             self.result = (max(0,x1),max(0,y1),min(1,x2),min(1,y2))
-        return "Comfortable range saved. Open palm turns control on; point to move." if self.result else self.error
+        return "Comfortable range saved. Fist then open palm turns control ON; point to move." if self.result else self.error

@@ -29,14 +29,18 @@ class EngineTests(unittest.TestCase):
         return actions
 
     def activate(self):
+        self.hold(hand(fingers=(True, False, False, False)))
+        self.hold(hand(fingers=(False,) * 4, thumb=False))
         actions = self.hold(hand())
         self.assertIn(('resume',), actions)
         self.assertFalse(self.engine.paused)
 
-    def test_open_palm_requires_stable_arming_and_fist_disarms(self):
+    def test_deliberate_fist_open_arms_and_new_open_fist_disarms(self):
         self.assertEqual(self.step(hand()), [])
         self.assertTrue(self.engine.paused)
         self.activate()
+        self.hold(hand(fingers=(True, False, False, False)))
+        self.hold(hand())
         actions = self.hold(hand(fingers=(False,) * 4))
         self.assertIn(('release_all',), actions)
         self.assertTrue(self.engine.paused)
@@ -92,7 +96,7 @@ class EngineTests(unittest.TestCase):
         self.activate()
         actions = self.hold(hand(index=0.1, middle=0.1, fingers=(False,) * 4))
         self.assertFalse(any(a[0] in ('voice_down', 'left_down') for a in actions))
-        self.assertTrue(self.engine.paused)
+        self.assertFalse(self.engine.paused)
 
     def test_hand_loss_releases_voice_but_keeps_armed(self):
         self.activate()
@@ -130,7 +134,7 @@ class EngineTests(unittest.TestCase):
         self.step(hand())
         self.assertEqual(self.engine.mode, 'idle')
 
-    def test_sustained_fist_releases_active_holds_and_pauses(self):
+    def test_sustained_fist_releases_active_holds_without_power_transition(self):
         for pinch, release in [('click', 'left_up'), ('dictate', 'voice_up')]:
             with self.subTest(pinch=pinch):
                 self.engine = Engine()
@@ -139,8 +143,7 @@ class EngineTests(unittest.TestCase):
                 self.hold(side_click() if pinch == 'click' else hand(middle=0.1))
                 actions = self.hold(hand(index=0.1, middle=0.1, fingers=(False,) * 4), 0.5)
                 self.assertEqual(actions.count((release,)), 1)
-                self.assertIn(('release_all',), actions)
-                self.assertTrue(self.engine.paused)
+                self.assertFalse(self.engine.paused)
                 self.assertEqual(self.engine.mode, 'idle')
 
     def test_thumbs_up_does_not_enter_or_pause_with_folded_fingertips(self):
@@ -159,13 +162,13 @@ class EngineTests(unittest.TestCase):
         self.assertFalse(any(a[0] == 'scroll' for a in actions))
         self.assertEqual(self.engine.mode, 'idle')
 
-    def test_thumbs_up_returns_to_pointer_or_fist_pause(self):
+    def test_thumbs_up_returns_to_pointer_or_fist_freeze(self):
         self.activate()
         self.hold(hand(fingers=(False,)*4, thumb=True))
         self.assertIn('move', [a[0] for a in self.step(hand(fingers=(True, False, False, False)))])
         self.hold(hand(fingers=(False,)*4, thumb=True))
         self.hold(hand(fingers=(False,)*4, thumb=False))
-        self.assertTrue(self.engine.paused)
+        self.assertFalse(self.engine.paused)
         self.assertEqual(self.engine.mode, 'idle')
 
     def test_brief_fist_does_not_end_hold_and_dwell_resets(self):

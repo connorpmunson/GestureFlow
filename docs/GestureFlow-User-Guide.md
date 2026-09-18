@@ -9,25 +9,27 @@ GestureFlow turns one visible hand into Windows mouse controls and a hold-to-tal
 2. Start FlowSpeak normally or use Launch in the Connected to FlowSpeak card. Confirm its existing Right Control hold-to-talk shortcut works in a text editor.
 3. Select your controlling hand and Pointer display. The camera opens automatically. To choose a different Camera index, stop the camera, change the index, then start it again.
 4. Enable Preview only - do not control PC to practice without moving the mouse or pressing keys.
-5. Calibrate with your elbow resting comfortably. Disable Preview only when ready, then hold an open palm for about 0.35 seconds to turn gesture control ON.
+5. Calibrate with your elbow resting comfortably. Disable Preview only when ready, then deliberately change a closed fist into an open palm to turn gesture control ON.
 6. Extend only the index to point at a text field. Keep it straight and touch the thumb to its side to click. Touch middle fingertip to thumb, hold while speaking, then separate to finish.
 
-Keep your keyboard and physical mouse available while learning. Ctrl+Alt+G locks gesture actions globally. Use the same shortcut or the app's unlock control to leave that lock, then show an open palm to turn control ON.
+Keep your keyboard and physical mouse available while learning. Ctrl+Alt+G locks gesture actions globally. Unlock with that shortcut or the app control, then make a fresh closed-fist-to-open-palm sequence to turn control ON.
 
-Open palm turns control ON; a closed fist turns it OFF. Camera tracking continues in both states. Index pointing moves the pointer only when control is ON; it never turns control ON or OFF. Gestures cannot bypass a keyboard lock. Stop the camera or close GestureFlow to end capture.
+A deliberate fist-to-palm sequence turns control ON; palm-to-fist turns it OFF. A static palm or fist never toggles control. Camera tracking stays on in both states, but gesture-generated mouse and keyboard actions are disabled while OFF. Pointing only moves the pointer while ON. After turning OFF, relax/change pose before starting a fresh fist-to-palm sequence; simply reopening the ending fist does not count. Gestures cannot bypass a keyboard lock.
+
+Hold the first pose for 0.25 seconds, then the second for 0.30 seconds. Complete the change within 1.5 seconds after leaving the first pose; intermediate bending poses are allowed. Losing the hand clears pending timing but does not make a completed sequence reusable.
 
 Right-hand control is selected by default. Hand labels are corrected for the mirrored camera input so Right means your anatomical right hand. Tracking can detect both hands, but only the selected hand controls input; your left hand can rest on your face. A right-hand label must have at least 80% confidence. If missing or uncertain, GestureFlow never substitutes the left: held input releases and movement freezes, while the ON/OFF state is retained. The selector remains available to change your preference.
 
 ## Install on a laptop
 
-GestureFlow v0.1.1 targets Windows on Intel/AMD 64-bit processors. This release is not for macOS, Linux, or native Windows ARM. Install Python 3.13 64-bit first; choose that version on python.org's Windows downloads page. Internet access is required during setup.
+GestureFlow v0.1.2 targets Windows on Intel/AMD 64-bit processors. This release is not for macOS, Linux, or native Windows ARM. Install Python 3.13 64-bit first; choose that version on python.org's Windows downloads page. Internet access is required during setup.
 
 1. Extract the complete source ZIP into a writable folder such as Documents\GestureFlow. Do not run from inside the ZIP or place it in Program Files.
 2. Double-click Install.cmd. It creates a local .venv, installs pinned binary wheels, runs pip check, validates model loading and the input helper, and creates a desktop shortcut.
 3. Launch the shortcut or Start-GestureFlow.cmd. This route needs neither the optional GestureFlow.exe nor .NET.
 4. Permit camera access for desktop apps in Windows privacy settings. Select the correct camera index if needed.
 5. Install FlowSpeak separately and confirm physical Right Ctrl works. GestureFlow looks in the current user's Documents folders; use Locate to select the laptop's FlowSpeak.exe when necessary.
-6. Calibrate your comfortable range on the laptop, practice in Preview only, then turn control ON with an open palm.
+6. Calibrate your comfortable range on the laptop, practice in Preview only, then deliberately change a closed fist into an open palm to turn control ON.
 
 The ZIP includes source, model, docs, and setup scripts. Python, installed dependencies, and FlowSpeak are not bundled. Do not copy another PC's .venv, settings.json, or calibration. Fresh settings use Right as the controlling hand with the floating status overlay off. Keep the extracted folder intact after installation.
 
@@ -42,7 +44,7 @@ Setup checks on the development PC do not establish compatibility with your phys
 | Action | Hand position | Behavior |
 | --- | --- | --- |
 | Move pointer | Extend only index finger; fold other three | Move your index fingertip within your calibrated area. |
-| Turn control ON | Open palm | Hold about 0.35 seconds. Camera remains on; pointer stays still until you point. |
+| Turn control ON | Closed fist, then open palm | Deliberate sequence required. A static palm never activates control. |
 | Click | Keep index straight; touch thumb to its side | Presses left mouse button at the current pointer; release contact to complete the click. |
 | Drag | Hold thumb against side of straight index | After 0.24 seconds, move the index fingertip; release contact to drop. |
 | FlowSpeak | Bend middle to thumb; extend index, ring, pinky | Hold this exact shape for Right Control. Release or change shape to finish recording. |
@@ -50,11 +52,11 @@ Setup checks on the development PC do not establish compatibility with your phys
 | Scroll | Thumbs-up: curl all four fingers, extend thumb | Hold about 0.16 seconds, then move up/down. Return to index pointing to move the cursor. |
 | Right-click | Extend thumb and pinky; fold other three fingers | Hold the shaka gesture for about 0.30 seconds. One click per gesture. |
 | Switch window | Extend index and pinky; close middle, ring, thumb | Hold to open switcher and cycle windows. Release gesture to select the highlight. |
-| Turn control OFF | Closed fist with thumb tucked | Hold about 0.30 seconds. Gesture actions stop; app and camera stay on. |
+| Turn control OFF | Open palm, then closed fist | Deliberate sequence required. Gesture actions stop; camera keeps listening. |
 | Lock controls | Ctrl+Alt+G | Locks input globally; gestures cannot unlock this state. |
 | Lock in app | Escape with GestureFlow focused | Locks input. |
 
-To click, keep the index extended and the other fingers curled, like a finger gun. Touch the thumb to the side of the index, not its fingertip. The old index-tip pinch no longer clicks. For FlowSpeak, bend middle to thumb with index, ring, and pinky extended. For Enter, bend ring to thumb with index, middle, and pinky extended. Maintain those exact shapes; losing contact or the finger pattern releases after about 0.10 seconds. A tucked-thumb fist ends held input and turns control OFF.
+To click, keep the index extended and the other fingers curled, like a finger gun. Touch the thumb to the index side, not its fingertip. For FlowSpeak, bend middle to thumb with index, ring, and pinky extended. For Enter, bend ring to thumb with index, middle, and pinky extended. Maintain those shapes; losing contact or the finger pattern releases after about 0.10 seconds. Use the deliberate palm-to-fist sequence to turn control OFF.
 
 ## How the interaction feels
 
@@ -86,7 +88,7 @@ You can also click or drag in the camera preview to reposition the pointer area 
 
 Rest your elbow where you intend to use the app. Click Calibrate wrist range and extend only your index finger. Follow the five prompts: center, comfortable left, comfortable right, comfortable up, and comfortable down. Hold each position for three seconds; avoid stretching to reach the camera's edges. If the hand is lost or the pointing pose changes, that step's hold restarts.
 
-Calibration maps your comfortable fingertip limits to the screen, saves them, and sets both sensitivities to 100%. Input is suppressed throughout; the prior ON/OFF state is restored afterward. Cancel preserves the prior range. If previously OFF, show an open palm afterward. A range that is too small or reversed, or a center outside the extremes, is rejected. Retry from the same resting position.
+Calibration maps your comfortable fingertip limits to the screen, saves them, and sets both sensitivities to 100%. Input is suppressed throughout; the prior ON/OFF state is restored afterward. Cancel preserves the prior range. If previously OFF, make a fresh fist-to-palm sequence afterward. A range that is too small or reversed, or a center outside the extremes, is rejected. Retry from the same resting position.
 
 ## FlowSpeak integration: existing behavior preserved
 
@@ -119,14 +121,14 @@ Video processing is local. GestureFlow does not record camera video or upload ca
 | Symptom | What to check |
 | --- | --- |
 | Camera will not open | Check Windows camera privacy access for desktop apps; close other camera apps; try the correct camera index. |
-| Preview works but cursor does not move | Check Preview only and keyboard lock. Show an open palm to turn control ON, then point with only the index. |
+| Preview works but cursor does not move | Check Preview only and keyboard lock. Make a fresh fist-to-palm sequence to turn ON, then point with only the index. |
 | Left hand is visible but does nothing | This is intentional with Right selected. Keep the right hand visible and face its palm toward the camera. |
 | Pointer shakes | Improve lighting, keep the entire hand visible, and increase smoothing. |
 | Cursor requires too much arm travel | Calibrate with your elbow resting, then increase horizontal or vertical sensitivity as needed. |
 | You must raise your arm too high | Recalibrate using a comfortable up/down range and increase vertical sensitivity. Drag the preview area lower if needed. |
 | Click is missed | Keep index straight and touch its side with the thumb; a fingertip pinch no longer clicks. |
 | FlowSpeak/Enter shape is missed | Bend only the target finger to the thumb and extend the other three. Compact pinches are accepted. Maintain the shape; changing it releases after about 0.10 seconds. |
-| Scroll does not start | Curl all four fingers and extend your thumb upward; hold briefly, then move vertically. Tucking the thumb changes to fist pause. |
+| Scroll does not start | Curl all four fingers and extend your thumb upward; hold briefly, then move vertically. A static tucked-thumb fist does not turn control OFF. |
 | Right-click repeats poorly | Leave the shaka gesture before making it again; hold it steadily for about 0.30 seconds. |
 | Dictation does not start | Confirm FlowSpeak is running and physical Right Control works first. Check its own microphone/transcription settings. |
 | Dictation ends unexpectedly | Keep the hand in frame and the pinch visible; hand loss releases the hold. |
@@ -142,10 +144,10 @@ Camera angle, lighting, motion blur, hand occlusion, and individual hand posture
 ## Your first practical test
 
 1. In Preview only, try every pose and confirm the status matches your intention.
-2. Calibrate your comfortable range. Show an open palm to turn control ON, then point with only the index and reach each screen corner. Adjust sensitivity.
+2. Calibrate your range. Make a deliberate fist-to-palm sequence to turn ON, then point with only the index and reach each screen corner. Adjust sensitivity.
 3. In a disposable document, click with thumb-to-index-side contact, select text by holding and dragging, then release. Confirm no button remains held.
 4. Open a long page, scroll both ways, then open and dismiss a context menu using shaka.
-5. Turn control OFF with a fist; pointing alone should do nothing. Turn it ON with open palm. Lock with Ctrl+Alt+G and verify no gesture unlocks it.
+5. Turn OFF with palm-to-fist. A static palm or fist should not toggle. Relax/change pose, then make a fresh fist-to-palm sequence to turn ON. Test the keyboard lock too.
 6. In a text field with FlowSpeak running, hold middle-thumb contact, speak a short sentence, and release. Confirm normal transcription/insertion.
 7. Move your hand out of frame during a short hold. Confirm release and frozen movement, then return and point; control should still be ON.
 
@@ -213,7 +215,7 @@ For troubleshooting, inspect work\gestureflow.log and work\input-helper.log. wor
 
 ## Verification
 
-The automated suite contains 83 passing tests. It covers calibration, fingertip pointing, pinch exclusivity, click/drag/Enter, hold release, hand loss, processing stalls, ON/OFF control, lock, right-click repeat protection, scrolling, monitor bounds, stale commands, EOF, broker watchdog cleanup, and confident right-hand selection regardless of result order. These tests use constructed hand states and a fake input backend; they do not prove physical-camera gesture accuracy or successful FlowSpeak transcription.
+The automated suite contains 99 passing tests. It covers calibration, fingertip pointing, pinch exclusivity, click/drag/Enter, hold release, hand loss, processing stalls, ON/OFF control, lock, right-click repeat protection, scrolling, monitor bounds, stale commands, EOF, broker watchdog cleanup, and confident right-hand selection regardless of result order. These tests use constructed hand states and a fake input backend; they do not prove physical-camera gesture accuracy or successful FlowSpeak transcription.
 
 On the original PC, the native launcher built and the UI was inspected. Camera 0 and inference ran near 30 FPS; FlowSpeak was detected. Ctrl+Alt+G locked and unlocked controls while capture continued. The shortcut uses Windows RegisterHotKey and Qt native events. FlowSpeak files were not modified.
 

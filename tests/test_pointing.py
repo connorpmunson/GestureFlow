@@ -24,10 +24,11 @@ class PointingTests(unittest.TestCase):
         return actions
 
     def activate(self):
+        self.hold(Hand((0.4, 0.4), 1, 1, (False,) * 4, False))
         self.hold(Hand((0.4, 0.4), 1, 1, (True,) * 4, True))
         self.assertFalse(self.engine.paused)
 
-    def test_pointing_never_arms_but_moves_tip_after_open_palm_arms(self):
+    def test_pointing_never_arms_but_moves_tip_after_deliberate_transition(self):
         self.assertEqual(self.hold(pointing()), [])
         self.assertTrue(self.engine.paused)
         self.activate()
@@ -47,7 +48,7 @@ class PointingTests(unittest.TestCase):
         self.activate()
         self.hold(pointing())
         self.assertFalse(any(a[0] == 'left_down' for a in self.hold(curled_click())))
-        self.assertTrue(self.engine.paused)
+        self.assertFalse(self.engine.paused)
 
     def test_thumb_resting_on_folded_middle_or_ring_does_not_activate(self):
         self.activate()

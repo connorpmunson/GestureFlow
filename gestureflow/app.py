@@ -277,7 +277,7 @@ class Window(QMainWindow):
         self.preview = Preview()
         self.preview.area_moved.connect(self.reposition_area)
         pc.addWidget(self.preview, stretch=1)
-        self.status = label("Open your hand to turn gesture control on", "section", True)
+        self.status = label("Make a fist, then open your hand to turn control ON", "section", True)
         pc.addWidget(self.status)
         self.details = label("Show one hand, with your palm toward the camera.", "muted", True)
         pc.addWidget(self.details)
@@ -296,7 +296,7 @@ class Window(QMainWindow):
         grid = QGridLayout()
         grid.setHorizontalSpacing(20)
         for row, (title, desc) in enumerate([
-            ("01  Open palm / closed fist", "Turn control ON / OFF"),
+            ("01  Fist → palm / palm → fist", "Turn control ON / OFF"),
             ("02  Index finger only", "Move cursor with your fingertip"),
             ("03  Thumb to index SIDE", "Finger-gun click · hold to drag"),
             ("04  Middle + thumb", "Others extended · hold FlowSpeak"),
@@ -454,6 +454,7 @@ class Window(QMainWindow):
         self.save_settings()
 
     def reset_tuning(self):
+        self.engine.reset_power_transition()
         for key,value in {"smoothing":45,"x_gain":100,"y_gain":100 if self.calibration_bounds else 150,"pinch":30,"scroll":100}.items():
             self.sliders[key][0].setValue(value)
 
@@ -506,7 +507,7 @@ class Window(QMainWindow):
             return
         result = self.calibrator.result if not cancelled else None
         message = ("Calibration cancelled. Previous range kept." if cancelled else
-                   self.calibrator.error or "Range saved. Open palm turns control on; point to move.")
+                   self.calibrator.error or "Range saved. Fist then open palm turns control ON; point to move.")
         self.calibrator = None
         if result:
             self.calibration_bounds = result

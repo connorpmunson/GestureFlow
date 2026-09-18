@@ -12,7 +12,7 @@ class SideClickTests(unittest.TestCase):
     def setUp(self):
         self.engine = Engine()
         self.now = 0.0
-        self.hold(hand(fingers=(True,) * 4, thumb=True))
+        self.engine.paused = False
 
     def hold(self, pose, seconds=0.5):
         actions = []
@@ -48,19 +48,19 @@ class SideClickTests(unittest.TestCase):
         actions = self.hold(hand(side=0.5), 0.2)
         self.assertEqual(actions.count(('left_up',)), 1)
 
-    def test_full_fist_disarms_and_releases_mouse_once(self):
+    def test_static_fist_releases_mouse_once_but_does_not_disarm(self):
         self.hold(hand(side=0.1))
         actions = self.hold(hand(fingers=(False,) * 4, side=0.01))
         self.assertEqual(actions.count(('left_up',)), 1)
-        self.assertTrue(self.engine.paused)
-        self.assertEqual(self.hold(hand(side=0.1)), [])
+        self.assertFalse(self.engine.paused)
+        self.assertEqual(self.engine.mode, 'idle')
 
-    def test_fist_releases_voice_and_click_before_independent_off_dwell(self):
+    def test_fist_releases_voice_and_click_without_changing_power(self):
         for pose, release in [(hand(side=0.1), 'left_up'),
                               (hand(fingers=(True, False, True, True), middle=0.1), 'voice_up')]:
             with self.subTest(release=release):
                 self.engine = Engine()
-                self.hold(hand(fingers=(True,) * 4))
+                self.engine.paused = False
                 self.hold(pose)
                 fist = hand(fingers=(False,) * 4, side=0.01, middle=0.01)
                 self.assertEqual(self.hold(fist, 0.08), [])
@@ -68,17 +68,14 @@ class SideClickTests(unittest.TestCase):
                 self.assertEqual(actions, [(release,)])
                 self.assertFalse(self.engine.paused)
                 self.assertEqual(self.engine.mode, 'idle')
-                # Total fist duration .36s exceeds OFF dwell; release at .12s
-                # must not reset that original timer and defer OFF until .42s.
-                actions = self.hold(fist, 0.20)
-                self.assertIn(('release_all',), actions)
-                self.assertNotIn((release,), actions)
-                self.assertTrue(self.engine.paused)
+                actions = self.hold(fist, 0.40)
+                self.assertEqual(actions, [])
+                self.assertFalse(self.engine.paused)
 
     def test_click_requires_straight_index_and_other_fingers_curled(self):
         for fingers in [(False,) * 4, (True,) * 4, (True, True, False, False)]:
             self.engine = Engine()
-            self.hold(hand(fingers=(True,) * 4))
+            self.engine.paused = False
             actions = self.hold(hand(fingers=fingers, side=0.01))
             self.assertFalse(any(a[0] == 'left_down' for a in actions))
 
@@ -94,7 +91,7 @@ class SideClickTests(unittest.TestCase):
                                (hand(fingers=(True, True, False, True), ring=0.1), 'enter'),
                                (hand(fingers=(False, False, False, True), thumb=True), 'right_click')]:
             self.engine = Engine()
-            self.hold(hand(fingers=(True,) * 4))
+            self.engine.paused = False
             actions = self.hold(pose)
             self.assertIn((expected,), actions)
             self.assertFalse(self.engine.paused)

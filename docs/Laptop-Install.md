@@ -1,18 +1,18 @@
-# GestureFlow v0.1.1 - laptop installation
+# GestureFlow v0.1.2 - laptop installation
 
 Use a Windows laptop with an Intel or AMD 64-bit processor and a working camera. This release is not for macOS, Linux, or native Windows ARM. Internet access is needed during dependency installation.
 
 ## Install
 
 1. Install **Python 3.13, 64-bit** from the tested [Python 3.13.13 release](https://www.python.org/downloads/release/python-31313/). If offered, include the Python launcher.
-2. Extract the **entire** v0.1.1 release **Source code (zip)** archive to a writable location such as your `Documents\GestureFlow` folder. Do not launch files from inside the ZIP, and avoid Program Files.
+2. Extract the **entire** v0.1.2 release **Source code (zip)** archive to a writable location such as your `Documents\GestureFlow` folder. Do not launch files from inside the ZIP, and avoid Program Files.
 3. Double-click **Install.cmd**. Leave the setup window open until it reports that setup is verified.
 4. Open the new **GestureFlow** desktop shortcut or double-click **Start-GestureFlow.cmd** in the extracted folder. This launch path needs neither the optional GestureFlow.exe nor .NET.
 5. Allow desktop apps to access the camera in Windows privacy settings. If the wrong camera opens, stop it in GestureFlow, change Camera index, then restart it.
 6. Install **FlowSpeak separately**. Confirm its physical Right Ctrl hold-to-talk behavior in a text field. GestureFlow looks in the current user's Documents folders; use **Locate** to select FlowSpeak.exe if needed, then **Launch**.
-7. Click **Calibrate wrist range** and follow center, left, right, up, down with your elbow resting. Hold an open palm to turn control ON afterward; point with only the index to move.
+7. Click **Calibrate wrist range** and follow center, left, right, up, down with your elbow resting. Make a fresh closed-fist-to-open-palm sequence to turn control ON afterward; point with only the index to move.
 
-Use Preview only while practicing. The default controlling hand is Right and the floating status overlay is off. Ctrl+Alt+G locks controls globally. A closed fist turns gesture control OFF while the camera remains on.
+Use Preview only while practicing. The default controlling hand is Right and the floating status overlay is off. Ctrl+Alt+G locks controls globally. A deliberate open-palm-to-closed-fist sequence turns control OFF while the camera stays listening; static poses never toggle. Hold the first pose 0.25 seconds and second 0.30 seconds within 1.5 seconds. Relax/change pose before a fresh sequence.
 
 The dashboard fits the available screen at startup and scrolls horizontally and vertically on small or scaled displays; both scrollbars were verified in an offscreen 640 x 480 check.
 

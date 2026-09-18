@@ -16,7 +16,7 @@ class EnterEngineTests(unittest.TestCase):
     def setUp(self):
         self.engine = Engine()
         self.now = 0.0
-        self.hold(pose())
+        self.engine.paused = False
 
     def hold(self, hand, duration=0.5):
         actions = []
@@ -58,14 +58,14 @@ class EnterEngineTests(unittest.TestCase):
     def test_fist_loss_and_lock_end_enter_without_repeating(self):
         for reason in ('fist', 'loss', 'lock'):
             self.engine = Engine()
-            self.hold(pose())
+            self.engine.paused = False
             self.assertEqual(self.hold(pose(ring=0.1)), [('enter',)])
             if reason == 'lock':
                 actions = self.engine.stop(locked=True) + self.hold(pose(ring=0.1))
             else:
                 actions = self.hold(None if reason == 'loss' else pose(ring=0.1, fingers=(False,) * 4))
             self.assertNotIn(('enter',), actions)
-            self.assertEqual(self.engine.paused, reason != 'loss')
+            self.assertEqual(self.engine.paused, reason == 'lock')
             self.assertEqual(self.engine.mode, 'idle')
 
     def test_tool_pose_requires_all_other_three_fingers_extended(self):

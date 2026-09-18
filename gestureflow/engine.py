@@ -71,7 +71,50 @@ class Engine:
         self.scroll_accum = 0.0
         self.right_latched = False
         self.right_clear_since = None
-        self.status = "Control OFF — open your palm to turn on"
+        self.power_consumed_pose = None
+        self.reset_power_transition()
+        self.status = "Control OFF — hold a fist, then open your palm"
+
+    def reset_power_transition(self):
+        """Forget incomplete transitions; retain the consumed-destination guard."""
+        self.power_source_since = None
+        self.power_source_ready = False
+        self.power_left_source_at = None
+        self.power_destination_since = None
+
+    def _power_transition(self, pose, now):
+        """Recognize a deliberate source -> destination sequence independently of tools."""
+        if self.power_consumed_pose is not None:
+            if pose == self.power_consumed_pose:
+                return False
+            self.power_consumed_pose = None
+        source, destination = ("fist", "open") if self.paused else ("open", "fist")
+        if pose == source:
+            if self.power_left_source_at is not None:
+                self.reset_power_transition()
+            if self.power_source_since is None:
+                self.power_source_since = now
+            if now - self.power_source_since >= 0.25:
+                self.power_source_ready = True
+            return False
+        if not self.power_source_ready:
+            self.reset_power_transition()
+            return False
+        if self.power_left_source_at is None:
+            self.power_left_source_at = now
+        if now - self.power_left_source_at > 1.5:
+            self.reset_power_transition()
+            return False
+        if pose != destination:
+            self.power_destination_since = None
+            return False
+        if self.power_destination_since is None:
+            self.power_destination_since = now
+        if now - self.power_destination_since < 0.30:
+            return False
+        self.reset_power_transition()
+        self.power_consumed_pose = destination
+        return True
 
     @property
     def click_on(self):
@@ -103,12 +146,13 @@ class Engine:
         """Release holds on lost/stalled tracking without changing the armed latch."""
         actions = self._exit()
         actions.append(("release_all",))
+        self.reset_power_transition()
         self.candidate = ""
         self.last_seen = None
         self.right_latched = False
         self.right_clear_since = None
         self.status = ("Controls locked — use the button or Ctrl+Alt+G" if self.locked else
-                       "Control OFF — open your palm to turn on" if self.paused else
+                       "Control OFF — hold a fist, then open your palm" if self.paused else
                        "Control ON — hand not tracked; inputs released")
         return actions
 
@@ -116,7 +160,7 @@ class Engine:
         self.paused = True
         self.locked = locked
         actions = self.release_tracking()
-        self.status = "Controls locked — use the button or Ctrl+Alt+G" if locked else "Control OFF — open your palm to turn on"
+        self.status = "Controls locked — use the button or Ctrl+Alt+G" if locked else "Control OFF — hold a fist, then open your palm"
         return actions
 
     def _stable(self, name, now, seconds):
@@ -130,8 +174,10 @@ class Engine:
             actions += self.release_tracking()
         self.last_tick = now
         if self.locked:
+            self.reset_power_transition()
             return actions
         if hand is None:
+            self.reset_power_transition()
             self.candidate = ""
             if self.last_seen is not None and now - self.last_seen > 0.30:
                 actions += self.release_tracking()
@@ -148,29 +194,33 @@ class Engine:
         enter_pose = i and m and not r and p
         switch_pose = i and not m and not r and p and not hand.thumb_out
 
-        if self.paused:
-            if open_palm and self._stable("resume", now, 0.35):
+        power_pose = "open" if open_palm else "fist" if fist else "other"
+        if self._power_transition(power_pose, now):
+            if self.paused:
                 self.paused = False
                 self.candidate = ""
                 self.status = "Control ON — point to move or make any tool gesture"
                 actions.append(("resume",))
-            elif not open_palm:
-                self.candidate = ""
+            else:
+                actions += self.stop()
+            return actions
+        if self.paused:
+            self.candidate = ""
+            self.status = "Control OFF — hold a fist, then open your palm"
             return actions
 
         if fist:
-            self.status = "Hold closed fist to turn control off"
-            # Shape release and the ON/OFF latch have independent dwell times.
-            # Exiting a hold must not restart the longer closed-fist OFF dwell.
+            self.status = "Control ON — closed fist; open-then-close turns control off"
+            # A fist releases input independently of any power-transition source.
+            # Static fists cannot change the persistent ON/OFF latch.
             if self.mode in ("click", "dictate", "enter", "switch"):
                 self.release_since = now if self.release_since is None else self.release_since
                 if now - self.release_since >= 0.10:
                     actions += self._exit()
-            if self._stable("pause", now, 0.30):
-                actions += self.stop()
-            return actions
-        if self.candidate == "pause":
+            elif self.mode == "scroll":
+                actions += self._exit()
             self.candidate = ""
+            return actions
 
         if self.mode == "switch":
             if not switch_pose:
